@@ -104,8 +104,10 @@ Add-Content -Path results\newman-pass.txt -Value "exit=$LASTEXITCODE" -Encoding 
 3. Эхний хэрэглэгчийн нэр `"Leanne Graham"`
 
 Энэ нь GET-only тул setup хэрэггүй, хариу нь тогтмол, олон нийтийн сервер тул өөрийн API-аас хялбар байсан; харин өөрийн API-д тест бүр өөрийн setup (PUT) хийж, олон алдааны төрлийг ялгах шаардлагатай байсан.
-Гаралт: `results/newman-public.txt`
-Collection: `lab05-public-api.json`
+
+- Collection: `lab05-public-api.json`
+- Гаралт: `results/newman-public.txt`
+
 ---
 
 ## 7. Дүгнэлт
