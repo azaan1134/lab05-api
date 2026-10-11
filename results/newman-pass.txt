@@ -1,0 +1,136 @@
+(node:33340) [DEP0176] DeprecationWarning: fs.F_OK is deprecated, use fs.constants.F_OK instead
+(Use `node --trace-deprecation ...` to show where the warning was created)
+newman
+
+Lab05. api-test
+
+Folder T1 Happy path: идэвхтэй оюутан, урьдач хангана → 201 OK
+Sub-folder Setup: идэвхтэй оюутан үүсгэх (coursesTaken=["CS201"])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 28ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=["CS201"])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 5ms]
+
+Sub-folder Идэвхтэй оюутан урьдач хангасан хичээлд бүртгүүлэхэд 201 OK
+  POST http://localhost:3000/registrations [201 Created, 203B, 3ms]
+  Pass  Идэвхтэй оюутан урьдач хангасан хичээлд бүртгүүлэхэд 201 OK: статус 201
+  Pass  Идэвхтэй оюутан урьдач хангасан хичээлд бүртгүүлэхэд 201 OK: result = OK
+
+Folder T2 Идэвхгүй оюутан → ERROR_INACTIVE_STUDENT
+Sub-folder Setup: идэвхгүй оюутан үүсгэх (coursesTaken=["CS201"])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 2ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=["CS201"])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 2ms]
+
+Sub-folder Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT
+  POST http://localhost:3000/registrations [200 OK, 198B, 3ms]
+  Pass  Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT: статус 200
+  Pass  Идэвхгүй оюутан бүртгүүлэхэд ERROR_INACTIVE_STUDENT: result = ERROR_INACTIVE_STUDENT
+
+Folder T3 Байхгүй оюутан → ERROR_NO_STUDENT
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=[])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 4ms]
+
+Sub-folder Байхгүй оюутан бүртгүүлэхэд ERROR_NO_STUDENT
+  POST http://localhost:3000/registrations [200 OK, 192B, 3ms]
+  Pass  Байхгүй оюутан бүртгүүлэхэд ERROR_NO_STUDENT: статус 200
+  Pass  Байхгүй оюутан бүртгүүлэхэд ERROR_NO_STUDENT: result = ERROR_NO_STUDENT
+
+Folder T4 Байхгүй хичээл → ERROR_NO_COURSE
+Sub-folder Setup: идэвхтэй оюутан үүсгэх (coursesTaken=["CS201"])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 3ms]
+
+Sub-folder Байхгүй хичээлд бүртгүүлэхэд ERROR_NO_COURSE
+  POST http://localhost:3000/registrations [200 OK, 191B, 3ms]
+  Pass  Байхгүй хичээлд бүртгүүлэхэд ERROR_NO_COURSE: статус 200
+  Pass  Байхгүй хичээлд бүртгүүлэхэд ERROR_NO_COURSE: result = ERROR_NO_COURSE
+
+Folder T5 Урьдач нөхцөл хангахгүй → ERROR_PREREQUISITES
+Sub-folder Setup: идэвхтэй оюутан үүсгэх (coursesTaken=[])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 6ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=["CS201"])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 2ms]
+
+Sub-folder Урьдач нөхцөл дутуу үед ERROR_PREREQUISITES, missing=[CS201]
+  POST http://localhost:3000/registrations [200 OK, 215B, 7ms]
+  Pass  Урьдач нөхцөл дутуу үед ERROR_PREREQUISITES, missing=[CS201]: статус 200
+  Pass  Урьдач нөхцөл дутуу үед ERROR_PREREQUISITES, missing=[CS201]: result = ERROR_PREREQUISITES
+  Pass  missing = ["CS201"] байна
+
+Folder T6 Зарим урьдач хангасан → ERROR_PREREQUISITES (зөвхөн дутууг жагсаана)
+Sub-folder Setup: идэвхтэй оюутан үүсгэх (coursesTaken=["CS201"])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 3ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=["CS201","CS202"])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 1ms]
+
+Sub-folder Урьдач нөхцлийн зарим нь үзсэн үед ERROR_PREREQUISITES, missing=[CS202]
+  POST http://localhost:3000/registrations [200 OK, 215B, 3ms]
+  Pass  Урьдач нөхцлийн зарим нь үзсэн үед ERROR_PREREQUISITES, missing=[CS202]: статус 200
+  Pass  Урьдач нөхцлийн зарим нь үзсэн үед ERROR_PREREQUISITES, missing=[CS202]: result = ERROR_PREREQUISITES
+  Pass  missing = ["CS202"] байна
+
+Folder T7 Давхар алдаа: идэвхгүй оюутан + урьдач дутуу
+Sub-folder Setup: идэвхгүй оюутан үүсгэх (coursesTaken=[])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 4ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=["CS201"])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 2ms]
+
+Sub-folder Идэвхгүй оюутан + урьдач дутуу үед ERROR_INACTIVE_STUDENT тэргүүлнэ
+  POST http://localhost:3000/registrations [200 OK, 198B, 2ms]
+  Pass  Идэвхгүй оюутан + урьдач дутуу үед ERROR_INACTIVE_STUDENT тэргүүлнэ: статус 200
+  Pass  Идэвхгүй оюутан + урьдач дутуу үед ERROR_INACTIVE_STUDENT тэргүүлнэ: result = ERROR_INACTIVE_STUDENT
+
+Folder T8 Давхар алдаа: байхгүй оюутан + байхгүй хичээл
+Sub-folder Оюутан ч хичээл ч байхгүй үед ERROR_NO_STUDENT тэргүүлнэ
+  POST http://localhost:3000/registrations [200 OK, 192B, 3ms]
+  Pass  Оюутан ч хичээл ч байхгүй үед ERROR_NO_STUDENT тэргүүлнэ: статус 200
+  Pass  Оюутан ч хичээл ч байхгүй үед ERROR_NO_STUDENT тэргүүлнэ: result = ERROR_NO_STUDENT
+
+Folder T9 Хязгаар: урьдач нөхцөлгүй хичээл, хоосон coursesTaken → 201
+Sub-folder Setup: идэвхтэй оюутан үүсгэх (coursesTaken=[])
+  PUT http://localhost:3000/students/B232270087 [200 OK, 178B, 3ms]
+
+Sub-folder Setup: CS313 хичээл үүсгэх (prerequisites=[])
+  PUT http://localhost:3000/courses/CS313 [200 OK, 178B, 2ms]
+
+Sub-folder Урьдачгүй хичээлд хоосон coursesTaken-тай оюутан бүртгүүлэхэд 201 OK
+  POST http://localhost:3000/registrations [201 Created, 203B, 1ms]
+  Pass  Урьдачгүй хичээлд хоосон coursesTaken-тай оюутан бүртгүүлэхэд 201 OK: статус 201
+  Pass  Урьдачгүй хичээлд хоосон coursesTaken-тай оюутан бүртгүүлэхэд 201 OK: result = OK
+
+Folder T10 Хязгаар: courseID талбар дутуу → 400 ERROR_BAD_REQUEST
+Sub-folder courseID дутуу үед 400 ERROR_BAD_REQUEST
+  POST http://localhost:3000/registrations [400 Bad Request, 202B, 2ms]
+  Pass  courseID дутуу үед 400 ERROR_BAD_REQUEST: статус 400
+  Pass  courseID дутуу үед 400 ERROR_BAD_REQUEST: result = ERROR_BAD_REQUEST
+
+Folder T11 Хязгаар: буруу JSON → 400 ERROR_BAD_JSON
+Sub-folder Буруу JSON үед 400 ERROR_BAD_JSON
+  POST http://localhost:3000/registrations [400 Bad Request, 199B, 3ms]
+  Pass  Буруу JSON үед 400 ERROR_BAD_JSON: статус 400
+  Pass  Буруу JSON үед 400 ERROR_BAD_JSON: result = ERROR_BAD_JSON
+
+---------------------------------------------------------------
+|                         |        executed |          failed |
+--------------------------+-----------------+------------------
+|              iterations |               1 |               0 |
+--------------------------+-----------------+------------------
+|                requests |              25 |               0 |
+--------------------------+-----------------+------------------
+|            test-scripts |              11 |               0 |
+--------------------------+-----------------+------------------
+|      prerequest-scripts |               0 |               0 |
+--------------------------+-----------------+------------------
+|              assertions |              24 |               0 |
+---------------------------------------------------------------
+| total run duration: 1809ms                                  |
+---------------------------------------------------------------
+| total data received: 597B (approx)                          |
+---------------------------------------------------------------
+| average response time: 4ms [min: 1ms, max: 28ms, s.d.: 5ms] |
+---------------------------------------------------------------
+exit=0
